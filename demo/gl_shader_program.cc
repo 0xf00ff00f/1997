@@ -67,42 +67,42 @@ int shader_program::uniform_location(const char *name) const
     return GL_CHECK_R(glGetUniformLocation(id_, name));
 }
 
-void shader_program::set_uniform_value_f(int location, GLfloat v0)
+void shader_program::set_uniform_f(int location, GLfloat v0)
 {
     GL_CHECK(glUniform1f(location, v0));
 }
 
-void shader_program::set_uniform_value_f(int location, GLfloat v0, GLfloat v1)
+void shader_program::set_uniform_f(int location, GLfloat v0, GLfloat v1)
 {
     GL_CHECK(glUniform2f(location, v0, v1));
 }
 
-void shader_program::set_uniform_value_f(int location, GLfloat v0, GLfloat v1, GLfloat v2)
+void shader_program::set_uniform_f(int location, GLfloat v0, GLfloat v1, GLfloat v2)
 {
     GL_CHECK(glUniform3f(location, v0, v1, v2));
 }
 
-void shader_program::set_uniform_value_f(int location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
+void shader_program::set_uniform_f(int location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
 {
     GL_CHECK(glUniform4f(location, v0, v1, v2, v3));
 }
 
-void shader_program::set_uniform_value_i(int location, GLint v0)
+void shader_program::set_uniform_i(int location, GLint v0)
 {
     GL_CHECK(glUniform1i(location, v0));
 }
 
-void shader_program::set_uniform_value_i(int location, GLint v0, GLint v1)
+void shader_program::set_uniform_i(int location, GLint v0, GLint v1)
 {
     GL_CHECK(glUniform2i(location, v0, v1));
 }
 
-void shader_program::set_uniform_value_i(int location, GLint v0, GLint v1, GLint v2)
+void shader_program::set_uniform_i(int location, GLint v0, GLint v1, GLint v2)
 {
     GL_CHECK(glUniform3i(location, v0, v1, v2));
 }
 
-void shader_program::set_uniform_value_i(int location, GLint v0, GLint v1, GLint v2, GLint v3)
+void shader_program::set_uniform_i(int location, GLint v0, GLint v1, GLint v2, GLint v3)
 {
     GL_CHECK(glUniform4i(location, v0, v1, v2, v3));
 }
@@ -112,42 +112,42 @@ void shader_program::set_uniform_matrix4(int location, const std::array<GLfloat,
     GL_CHECK(glUniformMatrix4fv(location, 1, 1, matrix4.data()));
 }
 
-void shader_program::set_uniform_value_f(const GLchar *name, GLfloat v0)
+void shader_program::set_uniform_f(const GLchar *name, GLfloat v0)
 {
     GL_CHECK(glUniform1f(uniform_location(name), v0));
 }
 
-void shader_program::set_uniform_value_f(const GLchar *name, GLfloat v0, GLfloat v1)
+void shader_program::set_uniform_f(const GLchar *name, GLfloat v0, GLfloat v1)
 {
     GL_CHECK(glUniform2f(uniform_location(name), v0, v1));
 }
 
-void shader_program::set_uniform_value_f(const GLchar *name, GLfloat v0, GLfloat v1, GLfloat v2)
+void shader_program::set_uniform_f(const GLchar *name, GLfloat v0, GLfloat v1, GLfloat v2)
 {
     GL_CHECK(glUniform3f(uniform_location(name), v0, v1, v2));
 }
 
-void shader_program::set_uniform_value_f(const GLchar *name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
+void shader_program::set_uniform_f(const GLchar *name, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
 {
     GL_CHECK(glUniform4f(uniform_location(name), v0, v1, v2, v3));
 }
 
-void shader_program::set_uniform_value_i(const GLchar *name, GLint v0)
+void shader_program::set_uniform_i(const GLchar *name, GLint v0)
 {
     GL_CHECK(glUniform1i(uniform_location(name), v0));
 }
 
-void shader_program::set_uniform_value_i(const GLchar *name, GLint v0, GLint v1)
+void shader_program::set_uniform_i(const GLchar *name, GLint v0, GLint v1)
 {
     GL_CHECK(glUniform2i(uniform_location(name), v0, v1));
 }
 
-void shader_program::set_uniform_value_i(const GLchar *name, GLint v0, GLint v1, GLint v2)
+void shader_program::set_uniform_i(const GLchar *name, GLint v0, GLint v1, GLint v2)
 {
     GL_CHECK(glUniform3i(uniform_location(name), v0, v1, v2));
 }
 
-void shader_program::set_uniform_value_i(const GLchar *name, GLint v0, GLint v1, GLint v2, GLint v3)
+void shader_program::set_uniform_i(const GLchar *name, GLint v0, GLint v1, GLint v2, GLint v3)
 {
     GL_CHECK(glUniform4i(uniform_location(name), v0, v1, v2, v3));
 }

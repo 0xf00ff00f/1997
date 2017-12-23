@@ -38,10 +38,20 @@ void arrows::init_gl_resources()
 
     program_->link();
 
-    std::array<GLfloat, NUM_CURVE_POINTS> verts;
-    for (int i = 0; i < NUM_CURVE_POINTS; ++i)
-        verts[i] = static_cast<float>(i)/(NUM_CURVE_POINTS - 1);
-    vbo_->set_data(verts.size()*sizeof(GLfloat), verts.data());
+    struct line {
+        GLfloat t0;
+        GLfloat is_shadow_0;
+        GLfloat t1;
+        GLfloat is_shadow_1;
+    };
+    std::array<line, 2*(NUM_CURVE_POINTS - 1)> verts;
+    for (int i = 0; i < NUM_CURVE_POINTS - 1; ++i) {
+        const float t0 = static_cast<float>(i)/(NUM_CURVE_POINTS - 1);
+        const float t1 = static_cast<float>(i + 1)/(NUM_CURVE_POINTS - 1);
+        verts[i] = { t0, 1.0, t1, 1.0 };
+        verts[i + (NUM_CURVE_POINTS - 1)] = { t0, 0.0, t1, 0.0 };
+    }
+    vbo_->set_data(verts.size()*sizeof(line), verts.data());
 
     state_texture_->allocate(GL_RG, GL_FLOAT);
     state_texture_->set_min_filter(GL_NEAREST);
@@ -63,7 +73,7 @@ void arrows::init_arrows()
 
     arrows_.resize(NUM_ARROWS);
     for (auto& arrow : arrows_) {
-        std::tie(arrow.p0, arrow.d0, arrow.phi0) = gen_control_point(-20, -10, .5*height_ - 10, .5*height_ + 10, 5, 10);
+        std::tie(arrow.p0, arrow.d0, arrow.phi0) = gen_control_point(-40, -20, .5*height_ - 10, .5*height_ + 10, 5, 10);
         std::tie(arrow.p1, arrow.d1, arrow.phi1) = gen_control_point(40, 80, .5*height_ - 200, .5*height_ + 200, 80, 120);
         std::tie(arrow.p2, arrow.d2, arrow.phi2) = gen_control_point(200, 400, .5*height_ - 200, .5*height_ + 200, 160, 240);
     }
@@ -99,15 +109,19 @@ void arrows::redraw(unsigned time)
 
     program_->bind();
     program_->set_uniform_matrix4("proj_modelview", ortho_proj_);
-    program_->set_uniform_value_f("start_thickness", 40.0);
-    program_->set_uniform_value_f("end_thickness", 80.0);
-    program_->set_uniform_value_i("state_texture", 0); // texunit 0
+    program_->set_uniform_f("start_thickness", 40.0);
+    program_->set_uniform_f("end_thickness", 80.0);
+    program_->set_uniform_f("shadow_offset", 8.0, -8.0);
+    program_->set_uniform_i("state_texture", 0); // texunit 0
 
     state_texture_->bind();
 
     vbo_->bind();
     GL_CHECK(glEnableVertexAttribArray(0));
-    GL_CHECK(glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<void*>(0)));
+    GL_CHECK(glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), reinterpret_cast<void*>(0)));
 
-    GL_CHECK(glDrawArraysInstanced(GL_LINE_STRIP, 0, NUM_CURVE_POINTS, NUM_ARROWS));
+    GL_CHECK(glEnableVertexAttribArray(1));
+    GL_CHECK(glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), reinterpret_cast<void*>(sizeof(GLfloat))));
+
+    GL_CHECK(glDrawArraysInstanced(GL_LINES, 0, 2*2*(NUM_CURVE_POINTS - 1), NUM_ARROWS));
 }
