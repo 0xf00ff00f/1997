@@ -16,4 +16,5 @@ private:
     int width_;
     int height_;
     std::unique_ptr<effect> effect_;
+    uint64_t start_ms_ = static_cast<uint64_t>(-1);
 };

@@ -1,5 +1,7 @@
 #include "util.h"
 
+#include <cstdlib>
+
 std::array<GLfloat, 16> init_ortho_projection_matrix(int min_x, int max_x, int min_y, int max_y)
 {
 	constexpr GLfloat Z_NEAR = -1.f;
@@ -17,4 +19,14 @@ std::array<GLfloat, 16> init_ortho_projection_matrix(int min_x, int max_x, int m
 		     0, b, 0, ty,
 		     0, 0, c, tz,
 		     0, 0, 0, 1 };
+}
+
+float randf()
+{
+    return static_cast<float>(rand())/RAND_MAX;
+}
+
+float randf(float min, float max)
+{
+    return min + randf()*(max - min);
 }

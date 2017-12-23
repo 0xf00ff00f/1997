@@ -8,9 +8,9 @@ public:
     effect(int width, int height);
     virtual ~effect() = default;
 
-    virtual void redraw() = 0;
+    virtual void redraw(unsigned time) = 0;
 
-private:
+protected:
     int width_;
     int height_;
 };

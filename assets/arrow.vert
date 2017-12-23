@@ -19,6 +19,7 @@ out vec2 v_dir;
 
 void main(void)
 {
+    // quadratic bezier
     vec2 p = mix(mix(p0, p1, t), mix(p1, p2, t), t);
     gl_Position = vec4(p, 0.0, 1.0);
 
