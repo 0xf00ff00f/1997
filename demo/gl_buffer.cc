@@ -1,6 +1,5 @@
 #include "gl_buffer.h"
 
-#include "panic.h"
 #include "gl_check.h"
 
 namespace gl {
@@ -9,6 +8,11 @@ buffer::buffer(GLenum target)
     : target_{target}
 {
     GL_CHECK(glGenBuffers(1, &id_));
+}
+
+buffer::~buffer()
+{
+    GL_CHECK(glDeleteBuffers(1, &id_));
 }
 
 void buffer::bind()

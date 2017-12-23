@@ -6,14 +6,11 @@
 #include <GLFW/glfw3.h>
 
 namespace {
-
 constexpr int window_width = 512;
 constexpr int window_height = 256;
-
 }
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     if (!glfwInit())
         panic("glfwInit failed");

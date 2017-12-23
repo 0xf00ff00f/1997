@@ -15,6 +15,7 @@ set(DEMO_SOURCES
     util.cc
     gl_shader_program.cc
     gl_buffer.cc
+    gl_texture.cc
     demo.cc
     effect.cc
     arrows.cc)

@@ -10,6 +10,7 @@ class buffer : private noncopyable
 {
 public:
     buffer(GLenum target);
+    ~buffer();
 
     void bind();
     void set_data(GLsizeiptr size, const GLvoid *data, GLenum usage = GL_STATIC_DRAW);

@@ -1,5 +1,7 @@
 #version 330
 
+uniform sampler2DRect state_texture;
+
 uniform vec2 p0;
 uniform vec2 p1;
 uniform vec2 p2;
@@ -19,6 +21,10 @@ out vec2 v_dir;
 
 void main(void)
 {
+    vec2 p0 = texture(state_texture, vec2(0.5, gl_InstanceID + 0.5)).rg;
+    vec2 p1 = texture(state_texture, vec2(1.5, gl_InstanceID + 0.5)).rg;
+    vec2 p2 = texture(state_texture, vec2(2.5, gl_InstanceID + 0.5)).rg;
+
     // quadratic bezier
     vec2 p = mix(mix(p0, p1, t), mix(p1, p2, t), t);
     gl_Position = vec4(p, 0.0, 1.0);
