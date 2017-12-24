@@ -6,8 +6,8 @@
 #include <GLFW/glfw3.h>
 
 namespace {
-constexpr int window_width = 960;
-constexpr int window_height = 480;
+constexpr int window_width = 1024;
+constexpr int window_height = 512;
 }
 
 int main(int argc, char *argv[])

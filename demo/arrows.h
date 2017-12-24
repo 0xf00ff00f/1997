@@ -19,7 +19,7 @@ class arrows : public effect
 public:
     arrows(int width, int height);
 
-    void redraw(unsigned time);
+    void redraw(unsigned time) override;
 
 private:
     void init_gl_resources();

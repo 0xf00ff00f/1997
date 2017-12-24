@@ -18,7 +18,8 @@ set(DEMO_SOURCES
     gl_texture.cc
     demo.cc
     effect.cc
-    arrows.cc)
+    arrows.cc
+    text.cc)
 
 add_executable(demo ${DEMO_SOURCES})
 

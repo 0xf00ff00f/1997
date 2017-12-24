@@ -15,6 +15,7 @@ public:
 private:
     int width_;
     int height_;
-    std::unique_ptr<effect> effect_;
+    std::unique_ptr<effect> arrow_effect_;
+    std::unique_ptr<effect> text_effect_;
     uint64_t start_ms_ = static_cast<uint64_t>(-1);
 };

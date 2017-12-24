@@ -1,6 +1,7 @@
 #include "demo.h"
 
 #include "arrows.h"
+#include "text.h"
 #include "gl_check.h"
 
 #include <GL/glew.h>
@@ -21,7 +22,8 @@ uint64_t get_cur_ms()
 demo::demo(int width, int height)
     : width_{width}
     , height_{height}
-    , effect_{new arrows(width, height)}
+    , arrow_effect_{new arrows(width, height)}
+    , text_effect_{new text(width, height)}
 {
 }
 
@@ -39,5 +41,6 @@ void demo::redraw()
     GL_CHECK(glClearColor(0.5, 0.5, 0.5, 0.0));
     GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
 
-    effect_->redraw(cur_ms - start_ms_);
+    // arrow_effect_->redraw(cur_ms - start_ms_);
+    text_effect_->redraw(cur_ms - start_ms_);
 }
