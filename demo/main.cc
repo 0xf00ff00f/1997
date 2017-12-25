@@ -5,13 +5,24 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-namespace {
-constexpr int window_width = 910;
-constexpr int window_height = 512;
-}
+#include <unistd.h>
 
 int main(int argc, char *argv[])
 {
+    bool fullscreen = false;
+
+    int opt;
+    while ((opt = getopt(argc, argv, "f")) != -1) {
+        switch (opt) {
+            case 'f':
+                fullscreen = true;
+                break;
+
+            default:
+                break;
+        }
+    }
+
     if (!glfwInit())
         panic("glfwInit failed");
 
@@ -19,7 +30,21 @@ int main(int argc, char *argv[])
         panic("GLFW error: %s", description);
     });
 
-    GLFWwindow *window = glfwCreateWindow(window_width, window_height, "test", nullptr, nullptr);
+    int window_width, window_height;
+    GLFWmonitor *monitor;
+
+    if (!fullscreen) {
+        monitor = nullptr;
+        window_width = 910;
+        window_height = 512;
+    } else {
+        monitor = glfwGetPrimaryMonitor();
+        const auto mode = glfwGetVideoMode(monitor);
+        window_width = mode->width;
+        window_height = mode->height;
+    }
+
+    GLFWwindow *window = glfwCreateWindow(window_width, window_height, "1997", monitor, nullptr);
     if (!window)
         panic("glfwCreateWindow failed");
 
@@ -33,8 +58,11 @@ int main(int argc, char *argv[])
             glfwSetWindowShouldClose(window, GL_TRUE);
     });
 
+    int fb_width, fb_height;
+    glfwGetFramebufferSize(window, &fb_width, &fb_height);
+
     {
-        demo d(window_width, window_height);
+        demo d(fb_width, fb_height);
 
         while (!glfwWindowShouldClose(window)) {
             d.redraw();

@@ -14,6 +14,11 @@
 
 namespace {
 
+constexpr float aspect_ratio = 16.0/9.0;
+
+constexpr float virt_height = 640;
+constexpr float virt_width = virt_height*aspect_ratio;
+
 constexpr float half_thickness = 8;
 
 struct line_strip {
@@ -25,7 +30,7 @@ const struct {
     int code;
     int width;
     std::vector<line_strip> strips;
-} glyphs[] = {
+} glyphs[] {
     {
         'a',
         100,
@@ -240,10 +245,15 @@ text::~text()
 
 void text::redraw(unsigned)
 {
-    draw_string(32, 520, "flare");
-    draw_string(32, 360, "nineteen ninety seven");
-    draw_string(32, 200, "greetz lorem ipsum");
-    draw_string(32, 40, "the quick brown fox");
+    const std::array<const char *, 4> text { "flare", "nineteen", "ninety", "seven" };
+
+    constexpr int line_height = 124;
+    float y = .5*(virt_height + line_height*(text.size() - 1));
+
+    for (const auto line : text) {
+        draw_string(virt_width - 32 - string_width(line), y, line);
+        y -= line_height;
+    }
 }
 
 void text::init_gl_resources()
@@ -306,11 +316,6 @@ void text::init_glyph_infos()
 
 std::array<GLfloat, 16> text::mvp(float x, float y) const
 {
-    constexpr float aspect_ratio = 16.0/9.0;
-
-    constexpr float virt_height = 640;
-    constexpr float virt_width = virt_height*aspect_ratio;
-
     const GLfloat a = 2.f/virt_width;
     const GLfloat b = 2.f/virt_height;
 

@@ -1,5 +1,8 @@
 #version 330
 
+uniform vec2 resolution;
+uniform vec2 spotlight_center;
+
 in vertex_data {
     vec2 tex_coord;
     float is_shadow;
@@ -19,16 +22,16 @@ float in_arrow(vec2 p, float a, float b, float c, float h0, float h1)
 void main(void)
 {
     vec2 p = vec2(vertex_in.tex_coord.x, 2.0*abs(vertex_in.tex_coord.y - 0.5));
-
     float v_outer = in_arrow(p, 0.85, 1.0, 0.9, 1.0, 0.4);
 
     if (vertex_in.is_shadow == 1.0) {
         frag_color = vec4(0.0, 0.0, 0.0, 0.25*v_outer);
     } else {
-        float v_inner = in_arrow(p, 0.87, 1.0, 0.92, 0.8, 0.25);
+        float l = smoothstep(0.0, 0.5, length(gl_FragCoord.xy/resolution - spotlight_center));
+        vec3 color_inner = mix(vec3(1.0, 1.0, 1.0), vec3(1.0, 0.0, 0.0), l);
+        vec3 color_outer = .25*color_inner;
 
-        vec3 color_outer = vec3(0.125, 0.125, 0.125);
-        vec3 color_inner = vec3(1.0, 0.0, 0.0);
+        float v_inner = in_arrow(p, 0.87, 1.0, 0.92, 0.8, 0.25);
 
         frag_color = vec4(mix(color_outer, color_inner, v_inner), v_outer);
     }

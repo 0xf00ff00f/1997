@@ -80,9 +80,9 @@ void arrows::init_arrows()
 
     arrows_.resize(NUM_ARROWS);
     for (auto& arrow : arrows_) {
-        std::tie(arrow.p0, arrow.d0, arrow.phi0) = gen_control_point(-40, -20, .5*height_ - 10, .5*height_ + 10, 5, 10);
-        std::tie(arrow.p1, arrow.d1, arrow.phi1) = gen_control_point(40, 80, .5*height_ - 200, .5*height_ + 200, 80, 120);
-        std::tie(arrow.p2, arrow.d2, arrow.phi2) = gen_control_point(200, 400, .5*height_ - 200, .5*height_ + 200, 160, 240);
+        std::tie(arrow.p0, arrow.d0, arrow.phi0) = gen_control_point(-40, -20, 256 - 10, 256 + 10, 5, 10);
+        std::tie(arrow.p1, arrow.d1, arrow.phi1) = gen_control_point(40, 80, 256 - 200, 256 + 200, 80, 120);
+        std::tie(arrow.p2, arrow.d2, arrow.phi2) = gen_control_point(200, 400, 256 - 200, 256 + 200, 160, 240);
     }
 }
 
@@ -119,6 +119,8 @@ void arrows::redraw(unsigned time)
     program_->set_uniform_f("start_thickness", 40.0);
     program_->set_uniform_f("end_thickness", 80.0);
     program_->set_uniform_f("shadow_offset", 8.0, -8.0);
+    program_->set_uniform_f("resolution", width_, height_);
+    program_->set_uniform_f("spotlight_center", .05, .95);
     program_->set_uniform_i("state_texture", 0); // texunit 0
 
     state_texture_->bind();

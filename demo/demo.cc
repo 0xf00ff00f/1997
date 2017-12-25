@@ -41,6 +41,6 @@ void demo::redraw()
     GL_CHECK(glClearColor(0.5, 0.5, 0.5, 0.0));
     GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
 
-    // arrow_effect_->redraw(cur_ms - start_ms_);
+    arrow_effect_->redraw(cur_ms - start_ms_);
     text_effect_->redraw(cur_ms - start_ms_);
 }
