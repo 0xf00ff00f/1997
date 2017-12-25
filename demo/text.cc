@@ -165,11 +165,11 @@ const struct {
     },
 };
 
-std::vector<vec2f> triangle_strip_from_line_strip(const line_strip& verts)
+std::vector<std::pair<vec2f, vec2f>> triangle_strip_from_line_strip(const line_strip& verts)
 {
     assert(verts.size() >= 2);
 
-    std::vector<vec2f> tri_strip;
+    std::vector<std::pair<vec2f, vec2f>> tri_strip;
 
     // first
 
@@ -181,8 +181,7 @@ std::vector<vec2f> triangle_strip_from_line_strip(const line_strip& verts)
         const vec2f n = vec2f(-d.y, d.x);
         const vec2f u = n*half_thickness;
 
-        tri_strip.push_back(p0 - u);
-        tri_strip.push_back(p0 + u);
+        tri_strip.emplace_back(p0 - u, p0 + u);
     }
 
     for (size_t i = 1; i < verts.size() - 1; ++i) {
@@ -202,8 +201,7 @@ std::vector<vec2f> triangle_strip_from_line_strip(const line_strip& verts)
 
         vec2f u = n*l;
 
-        tri_strip.push_back(p1 - u);
-        tri_strip.push_back(p1 + u);
+        tri_strip.emplace_back(p1 - u, p1 + u);
     }
 
     // last
@@ -216,8 +214,7 @@ std::vector<vec2f> triangle_strip_from_line_strip(const line_strip& verts)
         const vec2f n = vec2f(-d.y, d.x);
         const vec2f u = n*half_thickness;
 
-        tri_strip.push_back(p0 - u);
-        tri_strip.push_back(p0 + u);
+        tri_strip.emplace_back(p0 - u, p0 + u);
     }
 
     return tri_strip;
@@ -268,18 +265,26 @@ void text::init_glyph_infos()
 
             if (!verts.empty()) {
                 // add degenerate triangle
-                auto prev_x = verts[verts.size() - 2];
-                auto prev_y = verts[verts.size() - 1];
+                auto prev_x = verts[verts.size() - 3];
+                auto prev_y = verts[verts.size() - 2];
+
                 verts.push_back(prev_x);
                 verts.push_back(prev_y);
+                verts.push_back(0);
 
-                verts.push_back(s.front().x);
-                verts.push_back(s.front().y);
+                verts.push_back(s.front().first.x);
+                verts.push_back(s.front().first.y);
+                verts.push_back(0);
             }
 
             for (const auto& v : s) {
-                verts.push_back(v.x);
-                verts.push_back(v.y);
+                verts.push_back(v.first.x);
+                verts.push_back(v.first.y);
+                verts.push_back(1);
+
+                verts.push_back(v.second.x);
+                verts.push_back(v.second.y);
+                verts.push_back(-1);
             }
         }
 
@@ -288,14 +293,14 @@ void text::init_glyph_infos()
 
         std::unique_ptr<glyph_info> gi{new glyph_info};
         gi->width = glyph.width;
-        gi->num_verts = verts.size()/2;
+        gi->num_verts = verts.size()/3;
         gi->vbo = std::move(vbo);
 
         glyph_infos_[glyph.code] = std::move(gi);
     }
 }
 
-std::array<GLfloat, 16> text::glyph_mvp(float x, float y) const
+std::array<GLfloat, 16> text::mvp(float x, float y) const
 {
     const float virt_width = 2275;
     const float virt_height = 1280;
@@ -311,17 +316,25 @@ std::array<GLfloat, 16> text::glyph_mvp(float x, float y) const
 
 void text::draw_string(float x, float y, const char *str) const
 {
+    GL_CHECK(glEnable(GL_BLEND));
+    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+
     program_->bind();
 
     for (const char *p = str; *p; ++p) {
         char ch = *p;
         auto& gi = glyph_infos_[ch];
         if (gi) {
-            program_->set_uniform_matrix4("proj_modelview", glyph_mvp(x, y));
+            program_->set_uniform_matrix4("proj_modelview", mvp(x, y));
 
             gi->vbo->bind();
+
             GL_CHECK(glEnableVertexAttribArray(0));
-            GL_CHECK(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<void*>(0)));
+            GL_CHECK(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(0)));
+
+            GL_CHECK(glEnableVertexAttribArray(1));
+            GL_CHECK(glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(2*sizeof(GLfloat))));
+
             GL_CHECK(glDrawArrays(GL_TRIANGLE_STRIP, 0, gi->num_verts));
 
             x += gi->width;
