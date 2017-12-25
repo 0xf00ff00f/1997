@@ -18,6 +18,7 @@ class arrows : public effect
 {
 public:
     arrows(int width, int height);
+    ~arrows();
 
     void redraw(unsigned time) override;
 

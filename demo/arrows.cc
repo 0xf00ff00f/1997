@@ -9,17 +9,24 @@
 namespace {
 constexpr int NUM_ARROWS = 256;
 constexpr int NUM_CURVE_POINTS = 30;
+
+constexpr float VIRT_WIDTH = 910;
+constexpr float VIRT_HEIGHT = 512;
 }
 
 arrows::arrows(int width, int height)
-    : effect(width, height)
-    , ortho_proj_{init_ortho_projection_matrix(0, width, 0, height)}
+    : effect{width, height}
+    , ortho_proj_{init_ortho_projection_matrix(VIRT_WIDTH, VIRT_HEIGHT)}
     , program_{new gl::shader_program}
     , vbo_{new gl::buffer(GL_ARRAY_BUFFER)}
     , state_texture_{new gl::texture(GL_TEXTURE_RECTANGLE, 4, NUM_ARROWS, GL_RG32F)}
 {
     init_gl_resources();
     init_arrows();
+}
+
+arrows::~arrows()
+{
 }
 
 void arrows::init_gl_resources()

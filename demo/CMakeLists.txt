@@ -7,7 +7,8 @@ find_package(GLEW REQUIRED)
 include_directories(
     ${OPENGL_INCLUDE_DIR}
     ${GLFW3_INCLUDE_DIR}
-    ${GLEW_INCLUDE_DIR})
+    ${GLEW_INCLUDE_DIR}
+    ${GLM_INCLUDE_DIR})
 
 set(DEMO_SOURCES
     main.cc
