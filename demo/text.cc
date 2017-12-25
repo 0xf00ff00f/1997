@@ -16,7 +16,10 @@ namespace {
 
 constexpr float half_thickness = 8;
 
-using line_strip = std::vector<vec2f>;
+struct line_strip {
+    bool closed;
+    std::vector<vec2f> verts;
+};
 
 const struct {
     int code;
@@ -26,195 +29,196 @@ const struct {
     {
         'a',
         100,
-        { { { 0, 88 }, { 88, 88 }, { 88, 8 }, { 8, 8 }, { 8, 16 }, { 88, 80 } } },
+        { { false, { { 0, 88 }, { 88, 88 }, { 88, 8 }, { 8, 8 }, { 8, 16 }, { 88, 80 } } } },
     },
     {
         'b',
         100,
-        { { { 8, 120 }, { 8, 8 }, { 88, 8 }, { 88, 16 }, { 8, 80 } } },
+        { { false, { { 8, 120 }, { 8, 8 }, { 88, 8 }, { 88, 16 }, { 8, 80 } } } },
     },
     {
         'c',
         100,
-        { { { 96, 88 }, { 8, 88 }, { 8, 8 }, { 96, 8 } } },
+        { { false, { { 96, 88 }, { 8, 88 }, { 8, 8 }, { 96, 8 } } } },
     },
     {
         'd',
         100,
-        { { { 88, 120 }, { 88, 8 }, { 8, 8 }, { 8, 16 }, { 88, 80 } } },
+        { { false, { { 88, 120 }, { 88, 8 }, { 8, 8 }, { 8, 16 }, { 88, 80 } } } },
     },
     {
         'e',
         100,
-        { { { 96, 8 }, { 8, 8 }, { 8, 88 }, { 88, 88 }, { 88, 80 }, { 8, 16 } } },
+        { { false, { { 96, 8 }, { 8, 8 }, { 8, 88 }, { 88, 88 }, { 88, 80 }, { 8, 16 } } } },
     },
     {
         'f',
         100,
-        { { { 8, -24 }, { 8, 88 }, { 96, 88 } },
-          { { 8, 8 }, { 96, 8 } } },
+        { { false, { { 8, -24 }, { 8, 88 }, { 96, 88 } } },
+          { false, { { 8, 8 }, { 96, 8 } } } },
     },
     {
         'g',
         100,
-        { { { 88, 8 }, { 8, 8 }, { 8, 88 }, { 88, 88 }, { 88, -24 } } },
+        { { false, { { 88, 8 }, { 8, 8 }, { 8, 88 }, { 88, 88 }, { 88, -24 } } } },
     },
     {
         'h',
         100,
-        { { { 8, 120 }, { 8, 0 } },
-          { { 8, 80 }, { 88, 16 }, { 88, 0 } } },
+        { { false, { { 8, 120 }, { 8, 0 } } },
+          { false, { { 8, 80 }, { 88, 16 }, { 88, 0 } } } },
     },
     {
         'i',
         20,
-        { { { 8, 0 }, { 8, 96 } },
-          { { 8, 104 }, { 8, 120 } } },
+        { { false, { { 8, 0 }, { 8, 96 } } },
+          { false, { { 8, 104 }, { 8, 120 } } } },
     },
     {
         'j',
         76,
-        { { { 64, 96 }, { 64, 16 }, { 24, -16 }, { 0, -16 } },
-          { { 64, 104 }, { 64, 120 } } },
+        { { false, { { 64, 96 }, { 64, 16 }, { 24, -16 }, { 0, -16 } } },
+          { false, { { 64, 104 }, { 64, 120 } } } },
     },
     {
         'k',
         100,
-        { { { 8, 120 }, { 8, 8 }, { 96, 8 } },
-          { { 8, 16 }, { 88, 80 }, { 88, 96 } } },
+        { { false, { { 8, 120 }, { 8, 8 }, { 96, 8 } } },
+          { false, { { 8, 16 }, { 88, 80 }, { 88, 96 } } } },
     },
     {
         'l',
         20,
-        { { { 8, 0 }, { 8, 120 } } },
+        { { false, { { 8, 0 }, { 8, 120 } } } },
     },
     {
         'm',
         100,
-        { { { 8, 0 }, { 8, 88 }, { 88, 88 }, { 88, 0 } },
-          { { 48, 88 }, { 48, 0 } } },
+        { { false, { { 8, 0 }, { 8, 88 }, { 88, 88 }, { 88, 0 } } },
+          { false, { { 48, 88 }, { 48, 0 } } } },
     },
     {
         'n',
         100,
-        { { { 8, 0 }, { 8, 88 }, { 48, 88 }, { 88, 56 }, { 88, 0 } } },
+        { { false, { { 8, 0 }, { 8, 88 }, { 48, 88 }, { 88, 56 }, { 88, 0 } } } },
     },
     {
         'o',
         100,
-        { { { 8, 0 }, { 8, 88 }, { 88, 88 }, { 88, 8 }, { 8, 8 } } },
+        { { true, { { 8, 8 }, { 8, 88 }, { 88, 88 }, { 88, 8 } } } },
     },
     {
         'p',
         100,
-        { { { 8, -24 }, { 8, 88 }, { 88, 88 }, { 88, 8 }, { 8, 8 } } },
+        { { false, { { 8, -24 }, { 8, 88 }, { 88, 88 }, { 88, 8 }, { 8, 8 } } } },
     },
     {
         'q',
         100,
-        { { { 88, -24 }, { 88, 88 }, { 8, 88 }, { 8, 80 }, { 88, 16 } } },
+        { { false, { { 88, -24 }, { 88, 88 }, { 8, 88 }, { 8, 80 }, { 88, 16 } } } },
     },
     {
         'r',
         100,
-        { { { 8, 0 }, { 8, 88 }, { 96, 88 } } },
+        { { false, { { 8, 0 }, { 8, 88 }, { 96, 88 } } } },
     },
     {
         's',
         100,
-        { { { 96, 88 }, { 8, 88 }, { 8, 48 }, { 88, 48 }, { 88, 8 }, { 0, 8 } } },
+        { { false, { { 96, 88 }, { 8, 88 }, { 8, 48 }, { 88, 48 }, { 88, 8 }, { 0, 8 } } } },
     },
     {
         't',
         100,
-        { { { 8, 120 }, { 8, 8 }, { 96, 8 } },
-          { { 8, 88 }, { 96, 88 } } },
+        { { false, { { 8, 120 }, { 8, 8 }, { 96, 8 } } },
+          { false, { { 8, 88 }, { 96, 88 } } } },
     },
     {
         'u',
         100,
-        { { { 8, 96 }, { 8, 8 }, { 88, 8 }, { 88, 96 } } }
+        { { false, { { 8, 96 }, { 8, 8 }, { 88, 8 }, { 88, 96 } } } }
     },
     {
         'v',
         100,
-        { { { 8, 96 }, { 8, 40 }, { 48, 8 }, { 88, 8 }, { 88, 96 } } },
+        { { false, { { 8, 96 }, { 8, 40 }, { 48, 8 }, { 88, 8 }, { 88, 96 } } } },
     },
     {
         'w',
         100,
-        { { { 8, 96 }, { 8, 8 }, { 88, 8 }, { 88, 96 } },
-          { { 48, 8 }, { 48, 96 } } },
+        { { false, { { 8, 96 }, { 8, 8 }, { 88, 8 }, { 88, 96 } } },
+          { false, { { 48, 8 }, { 48, 96 } } } },
     },
     {
         'x',
         100,
-        { { { 8, 96 }, { 8, 80 }, { 88, 16 }, { 88, 0 } },
-          { { 88, 96 }, { 88, 80 }, { 8, 16 }, { 8, 0 } } },
+        { { false, { { 8, 96 }, { 8, 80 }, { 88, 16 }, { 88, 0 } } },
+          { false, { { 88, 96 }, { 88, 80 }, { 8, 16 }, { 8, 0 } } } },
     },
     {
         'y',
         100,
-        { { { 8, 96 }, { 8, 80 }, { 88, 16 } },
-          { { 88, 96 }, { 88, -24 } } },
+        { { false, { { 8, 96 }, { 8, 80 }, { 88, 16 } } },
+          { false, { { 88, 96 }, { 88, -24 } } } },
     },
     {
         'z',
         100,
-        { { { 0, 88 }, { 88, 88 }, { 88, 80 }, { 8, 16 }, { 8, 8 }, { 96, 8 } } },
+        { { false, { { 0, 88 }, { 88, 88 }, { 88, 80 }, { 8, 16 }, { 8, 8 }, { 96, 8 } } } },
     },
 };
 
-std::vector<std::pair<vec2f, vec2f>> triangle_strip_from_line_strip(const line_strip& verts)
+std::vector<std::pair<vec2f, vec2f>> triangle_strip_from_line_strip(const line_strip& strip)
 {
+    const auto& verts = strip.verts;
+
     assert(verts.size() >= 2);
 
     std::vector<std::pair<vec2f, vec2f>> tri_strip;
 
-    // first
+    const auto num_verts = verts.size();
+    const auto count = strip.closed ? num_verts + 1 : num_verts;
 
-    {
-        const auto& p0 = verts[0];
-        const auto& p1 = verts[1];
+    for (size_t i = 0; i < count; ++i) {
+        const auto& p = verts[i%num_verts];
 
-        const vec2f d = normalized(p1 - p0);
-        const vec2f n = vec2f(-d.y, d.x);
-        const vec2f u = n*half_thickness;
+        vec2f u;
 
-        tri_strip.emplace_back(p0 - u, p0 + u);
-    }
+        if (i == 0 && !strip.closed) {
+            // first
+            const auto& p1 = verts[1];
 
-    for (size_t i = 1; i < verts.size() - 1; ++i) {
-        const auto& p0 = verts[i - 1];
-        const auto& p1 = verts[i];
-        const auto& p2 = verts[i + 1];
+            const vec2f d = normalized(p1 - p);
+            const vec2f n = vec2f(-d.y, d.x);
 
-        vec2f d0 = normalized(p1 - p0);
-        vec2f n0 = vec2f(-d0.y, d0.x);
+            u = n*half_thickness;
+        } else if (i == verts.size() - 1 && !strip.closed) {
+            // last
 
-        vec2f d1 = normalized(p2 - p1);
-        vec2f n1 = vec2f(-d1.y, d1.x);
+            const auto& p1 = verts[i - 1];
 
-        vec2f n = normalized(n0 + n1);
+            const vec2f d = normalized(p - p1);
+            const vec2f n = vec2f(-d.y, d.x);
 
-        float l = half_thickness/dot(n, n0);
+            u = n*half_thickness;
+        } else {
+            const auto& p0 = verts[(i + num_verts - 1)%num_verts];
+            const auto& p2 = verts[(i + 1)%num_verts];
 
-        vec2f u = n*l;
+            vec2f d0 = normalized(p - p0);
+            vec2f n0 = vec2f(-d0.y, d0.x);
 
-        tri_strip.emplace_back(p1 - u, p1 + u);
-    }
+            vec2f d1 = normalized(p2 - p);
+            vec2f n1 = vec2f(-d1.y, d1.x);
 
-    // last
+            vec2f n = normalized(n0 + n1);
 
-    {
-        const auto& p0 = verts[verts.size() - 1];
-        const auto& p1 = verts[verts.size() - 2];
+            float l = half_thickness/dot(n, n0);
 
-        const vec2f d = normalized(p0 - p1);
-        const vec2f n = vec2f(-d.y, d.x);
-        const vec2f u = n*half_thickness;
+            u = n*l;
+        }
 
-        tri_strip.emplace_back(p0 - u, p0 + u);
+        tri_strip.emplace_back(p - u, p + u);
     }
 
     return tri_strip;
@@ -302,8 +306,10 @@ void text::init_glyph_infos()
 
 std::array<GLfloat, 16> text::mvp(float x, float y) const
 {
-    const float virt_width = 2275;
-    const float virt_height = 1280;
+    constexpr float aspect_ratio = 16.0/9.0;
+
+    constexpr float virt_height = 640;
+    constexpr float virt_width = virt_height*aspect_ratio;
 
     const GLfloat a = 2.f/virt_width;
     const GLfloat b = 2.f/virt_height;
@@ -344,3 +350,19 @@ void text::draw_string(float x, float y, const char *str) const
     }
 }
 
+int text::string_width(const char *str) const
+{
+    int width = 0;
+
+    for (const char *p = str; *p; ++p) {
+        char ch = *p;
+        auto& gi = glyph_infos_[ch];
+        if (gi) {
+            width += gi->width;
+        } else {
+            width += 100;
+        }
+    }
+
+    return width;
+}
