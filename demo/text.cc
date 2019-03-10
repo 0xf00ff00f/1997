@@ -174,7 +174,7 @@ const struct {
     },
 };
 
-std::vector<std::pair<vec2f, vec2f>> triangle_strip_from_line_strip(const line_strip& strip)
+auto triangle_strip_from_line_strip(const line_strip& strip)
 {
     const auto& verts = strip.verts;
 
