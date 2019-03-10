@@ -10,6 +10,7 @@
 namespace gl {
 class shader_program;
 class buffer;
+class vertex_array;
 }
 
 class text : public effect
@@ -31,6 +32,7 @@ private:
     struct glyph_info {
         int width;
         int num_verts;
+        std::unique_ptr<gl::vertex_array> vao;
         std::unique_ptr<gl::buffer> vbo;
     };
     std::array<std::unique_ptr<glyph_info>, 256> glyph_infos_;

@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
         window_height = mode->height;
     }
 
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     GLFWwindow *window = glfwCreateWindow(window_width, window_height, "1997", monitor, nullptr);
     if (!window)
         panic("glfwCreateWindow failed");

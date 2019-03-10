@@ -4,6 +4,7 @@
 #include "gl_check.h"
 #include "gl_shader_program.h"
 #include "gl_buffer.h"
+#include "gl_vertex_array.h"
 #include "gl_texture.h"
 
 namespace {
@@ -19,6 +20,7 @@ arrows::arrows(int width, int height)
     , ortho_proj_{init_ortho_projection_matrix(VIRT_WIDTH, VIRT_HEIGHT)}
     , program_{new gl::shader_program}
     , vbo_{new gl::buffer(GL_ARRAY_BUFFER)}
+    , vao_{new gl::vertex_array}
     , state_texture_{new gl::texture(GL_TEXTURE_RECTANGLE, 4, NUM_ARROWS, GL_RG32F)}
 {
     init_gl_resources();
@@ -59,6 +61,13 @@ void arrows::init_gl_resources()
         verts[i + (NUM_CURVE_POINTS - 1)] = { t0, 0.0, t1, 0.0 };
     }
     vbo_->set_data(verts.size()*sizeof(line), verts.data());
+
+    vao_->bind();
+    GL_CHECK(glEnableVertexAttribArray(0));
+    GL_CHECK(glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), reinterpret_cast<void*>(0)));
+
+    GL_CHECK(glEnableVertexAttribArray(1));
+    GL_CHECK(glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), reinterpret_cast<void*>(sizeof(GLfloat))));
 
     state_texture_->allocate(GL_RG, GL_FLOAT);
     state_texture_->set_min_filter(GL_NEAREST);
@@ -125,12 +134,6 @@ void arrows::redraw(unsigned time)
 
     state_texture_->bind();
 
-    vbo_->bind();
-    GL_CHECK(glEnableVertexAttribArray(0));
-    GL_CHECK(glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), reinterpret_cast<void*>(0)));
-
-    GL_CHECK(glEnableVertexAttribArray(1));
-    GL_CHECK(glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), reinterpret_cast<void*>(sizeof(GLfloat))));
-
+    vao_->bind();
     GL_CHECK(glDrawArraysInstanced(GL_LINES, 0, 2*2*(NUM_CURVE_POINTS - 1), NUM_ARROWS));
 }

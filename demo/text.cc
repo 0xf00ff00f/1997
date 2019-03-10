@@ -3,6 +3,7 @@
 #include "gl_check.h"
 #include "gl_shader_program.h"
 #include "gl_buffer.h"
+#include "gl_vertex_array.h"
 #include "vec2.h"
 
 #include <GL/glew.h>
@@ -305,10 +306,20 @@ void text::init_glyph_infos()
         std::unique_ptr<gl::buffer> vbo{new gl::buffer(GL_ARRAY_BUFFER)};
         vbo->set_data(verts.size()*sizeof(GLfloat), &verts[0]);
 
+        std::unique_ptr<gl::vertex_array> vao{new gl::vertex_array};
+        vao->bind();
+
+        GL_CHECK(glEnableVertexAttribArray(0));
+        GL_CHECK(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(0)));
+
+        GL_CHECK(glEnableVertexAttribArray(1));
+        GL_CHECK(glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(2*sizeof(GLfloat))));
+
         std::unique_ptr<glyph_info> gi{new glyph_info};
         gi->width = glyph.width;
         gi->num_verts = verts.size()/3;
         gi->vbo = std::move(vbo);
+        gi->vao = std::move(vao);
 
         glyph_infos_[glyph.code] = std::move(gi);
     }
@@ -338,14 +349,7 @@ void text::draw_string(float x, float y, const char *str) const
         if (gi) {
             program_->set_uniform_matrix4("proj_modelview", mvp(x, y));
 
-            gi->vbo->bind();
-
-            GL_CHECK(glEnableVertexAttribArray(0));
-            GL_CHECK(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(0)));
-
-            GL_CHECK(glEnableVertexAttribArray(1));
-            GL_CHECK(glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(2*sizeof(GLfloat))));
-
+            gi->vao->bind();
             GL_CHECK(glDrawArrays(GL_TRIANGLE_STRIP, 0, gi->num_verts));
 
             x += gi->width;

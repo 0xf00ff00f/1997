@@ -11,6 +11,7 @@
 namespace gl {
 class shader_program;
 class buffer;
+class vertex_array;
 class texture;
 }
 
@@ -37,6 +38,7 @@ private:
     std::array<GLfloat, 16> ortho_proj_;
     std::unique_ptr<gl::shader_program> program_;
     std::unique_ptr<gl::buffer> vbo_;
+    std::unique_ptr<gl::vertex_array> vao_;
     std::unique_ptr<gl::texture> state_texture_;
     std::vector<GLfloat> state_data_;
 };
