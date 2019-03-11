@@ -31,10 +31,11 @@ private:
 
     struct glyph_info {
         int width;
+        int first_vert;
         int num_verts;
-        std::unique_ptr<gl::vertex_array> vao;
-        std::unique_ptr<gl::buffer> vbo;
     };
     std::array<std::unique_ptr<glyph_info>, 256> glyph_infos_;
     std::unique_ptr<gl::shader_program> program_;
+    std::unique_ptr<gl::buffer> vbo_;
+    std::unique_ptr<gl::vertex_array> vao_;
 };

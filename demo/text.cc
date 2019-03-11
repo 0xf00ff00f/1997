@@ -235,6 +235,8 @@ auto triangle_strip_from_line_strip(const line_strip& strip)
 text::text(int width, int height)
     : effect{width, height}
     , program_{new gl::shader_program}
+    , vbo_{new gl::buffer(GL_ARRAY_BUFFER)}
+    , vao_{new gl::vertex_array}
 {
     init_gl_resources();
     init_glyph_infos();
@@ -272,8 +274,12 @@ void text::init_gl_resources()
 
 void text::init_glyph_infos()
 {
+    std::vector<GLfloat> verts;
+
     for (const auto& glyph : glyphs) {
-        std::vector<GLfloat> verts;
+        std::unique_ptr<glyph_info> gi{new glyph_info};
+        gi->width = glyph.width;
+        gi->first_vert = verts.size()/3;
 
         for (auto& line_strip : glyph.strips) {
             auto s = triangle_strip_from_line_strip(line_strip);
@@ -303,26 +309,17 @@ void text::init_glyph_infos()
             }
         }
 
-        std::unique_ptr<gl::buffer> vbo{new gl::buffer(GL_ARRAY_BUFFER)};
-        vbo->set_data(verts.size()*sizeof(GLfloat), &verts[0]);
-
-        std::unique_ptr<gl::vertex_array> vao{new gl::vertex_array};
-        vao->bind();
-
-        GL_CHECK(glEnableVertexAttribArray(0));
-        GL_CHECK(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(0)));
-
-        GL_CHECK(glEnableVertexAttribArray(1));
-        GL_CHECK(glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(2*sizeof(GLfloat))));
-
-        std::unique_ptr<glyph_info> gi{new glyph_info};
-        gi->width = glyph.width;
-        gi->num_verts = verts.size()/3;
-        gi->vbo = std::move(vbo);
-        gi->vao = std::move(vao);
-
+        gi->num_verts = verts.size()/3 - gi->first_vert;
         glyph_infos_[glyph.code] = std::move(gi);
     }
+
+    vbo_->set_data(verts.size()*sizeof(GLfloat), &verts[0]);
+
+    vao_->bind();
+    GL_CHECK(glEnableVertexAttribArray(0));
+    GL_CHECK(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(0)));
+    GL_CHECK(glEnableVertexAttribArray(1));
+    GL_CHECK(glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(2*sizeof(GLfloat))));
 }
 
 std::array<GLfloat, 16> text::mvp(float x, float y) const
@@ -342,6 +339,7 @@ void text::draw_string(float x, float y, const char *str) const
     GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
 
     program_->bind();
+    vao_->bind();
 
     for (const char *p = str; *p; ++p) {
         char ch = *p;
@@ -349,8 +347,7 @@ void text::draw_string(float x, float y, const char *str) const
         if (gi) {
             program_->set_uniform_matrix4("proj_modelview", mvp(x, y));
 
-            gi->vao->bind();
-            GL_CHECK(glDrawArrays(GL_TRIANGLE_STRIP, 0, gi->num_verts));
+            GL_CHECK(glDrawArrays(GL_TRIANGLE_STRIP, gi->first_vert, gi->num_verts));
 
             x += gi->width;
         } else {
