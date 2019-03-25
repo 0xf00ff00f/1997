@@ -95,7 +95,7 @@ void arrows::init_arrows()
     }
 }
 
-void arrows::redraw(unsigned time)
+void arrows::redraw(long time)
 {
     const float t = static_cast<float>(time)/1000.0;
 

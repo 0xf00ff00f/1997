@@ -2,6 +2,8 @@
 
 #include "noncopyable.h"
 #include "effect.h"
+
+#include <chrono>
 #include <memory>
 
 class demo : private noncopyable
@@ -17,5 +19,5 @@ private:
     int height_;
     std::unique_ptr<effect> arrow_effect_;
     std::unique_ptr<effect> text_effect_;
-    uint64_t start_ms_ = static_cast<uint64_t>(-1);
+    std::chrono::steady_clock::time_point start_;
 };

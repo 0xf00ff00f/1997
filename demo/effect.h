@@ -8,7 +8,7 @@ public:
     effect(int width, int height);
     virtual ~effect() = default;
 
-    virtual void redraw(unsigned time) = 0;
+    virtual void redraw(long elapsed) = 0;
 
 protected:
     int width_;

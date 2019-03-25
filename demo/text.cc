@@ -246,7 +246,7 @@ text::~text()
 {
 }
 
-void text::redraw(unsigned)
+void text::redraw(long)
 {
     const std::array<const char *, 4> text { "flare", "nineteen", "ninety", "seven" };
 

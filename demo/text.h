@@ -19,7 +19,7 @@ public:
     text(int width, int height);
     ~text();
 
-    void redraw(unsigned time) override;
+    void redraw(long time) override;
 
 private:
     void init_gl_resources();

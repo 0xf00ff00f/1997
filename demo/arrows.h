@@ -21,7 +21,7 @@ public:
     arrows(int width, int height);
     ~arrows();
 
-    void redraw(unsigned time) override;
+    void redraw(long time) override;
 
 private:
     void init_gl_resources();
