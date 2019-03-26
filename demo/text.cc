@@ -270,14 +270,8 @@ void text::redraw(long)
 
 void text::init_gl_resources()
 {
-    gl::shader vert_shader(GL_VERTEX_SHADER);
-    vert_shader.compile_source_file("assets/text.vert");
-    program_->add_shader(vert_shader);
-
-    gl::shader frag_shader(GL_FRAGMENT_SHADER);
-    frag_shader.compile_source_file("assets/text.frag");
-    program_->add_shader(frag_shader);
-
+    program_->add_shader(GL_VERTEX_SHADER, "assets/text.vert");
+    program_->add_shader(GL_FRAGMENT_SHADER, "assets/text.frag");
     program_->link();
 }
 

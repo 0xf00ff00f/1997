@@ -8,53 +8,43 @@
 
 namespace gl
 {
-
-shader::shader(GLenum type)
-    : id_{glCreateShader(type)}
-{ }
-
-void shader::compile_source_code(const char *source)
-{
-    glShaderSource(id_, 1, &source, nullptr);
-    glCompileShader(id_);
-
-    int rv;
-    glGetShaderiv(id_, GL_COMPILE_STATUS, &rv);
-    if (!rv) {
-        std::array<GLchar, 64*1024> buf;
-        GLsizei length;
-        glGetShaderInfoLog(id_, buf.size() - 1, &length, buf.data());
-        panic("failed to compile shader:\n%.*s", length, buf.data());
-    }
-}
-
-void shader::compile_source_file(const std::string& filename)
-{
-    std::ifstream file{filename};
-
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-
-    compile_source_code(buffer.str().c_str());
-}
-
 shader_program::shader_program()
     : id_{glCreateProgram()}
 { }
 
-void
-shader_program::add_shader(const shader& s)
+void shader_program::add_shader(GLenum type, std::string_view filename)
 {
-    glAttachShader(id_, s.id());
+    const auto shader_id = glCreateShader(type);
+
+    const auto source = [filename] {
+        std::ifstream file{filename.data()};
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        return buffer.str();
+    }();
+    const auto source_ptr = source.data();
+    glShaderSource(shader_id, 1, &source_ptr, nullptr);
+    glCompileShader(shader_id);
+
+    int status;
+    glGetShaderiv(shader_id, GL_COMPILE_STATUS, &status);
+    if (!status) {
+        std::array<GLchar, 64*1024> buf;
+        GLsizei length;
+        glGetShaderInfoLog(shader_id, buf.size() - 1, &length, buf.data());
+        panic("failed to compile shader:\n%.*s", length, buf.data());
+    }
+
+    glAttachShader(id_, shader_id);
 }
 
 void shader_program::link()
 {
     glLinkProgram(id_);
 
-    int rv;
-    glGetProgramiv(id_, GL_LINK_STATUS, &rv);
-    if (!rv)
+    int status;
+    glGetProgramiv(id_, GL_LINK_STATUS, &status);
+    if (!status)
         panic("failed to link shader_program");
 }
 
@@ -63,9 +53,9 @@ void shader_program::bind()
     glUseProgram(id_);
 }
 
-int shader_program::uniform_location(const char *name) const
+int shader_program::uniform_location(std::string_view name) const
 {
-    return glGetUniformLocation(id_, name);
+    return glGetUniformLocation(id_, name.data());
 }
 
 void shader_program::set_uniform_f(int location, GLfloat v0)

@@ -30,18 +30,9 @@ arrows::~arrows() = default;
 
 void arrows::init_gl_resources()
 {
-    gl::shader vert_shader(GL_VERTEX_SHADER);
-    vert_shader.compile_source_file("assets/arrow.vert");
-    program_->add_shader(vert_shader);
-
-    gl::shader geom_shader(GL_GEOMETRY_SHADER);
-    geom_shader.compile_source_file("assets/arrow.geom");
-    program_->add_shader(geom_shader);
-
-    gl::shader frag_shader(GL_FRAGMENT_SHADER);
-    frag_shader.compile_source_file("assets/arrow.frag");
-    program_->add_shader(frag_shader);
-
+    program_->add_shader(GL_VERTEX_SHADER, "assets/arrow.vert");
+    program_->add_shader(GL_GEOMETRY_SHADER, "assets/arrow.geom");
+    program_->add_shader(GL_FRAGMENT_SHADER, "assets/arrow.frag");
     program_->link();
 
     struct vertex

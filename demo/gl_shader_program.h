@@ -5,36 +5,21 @@
 #include <GL/glew.h>
 
 #include <array>
-#include <string>
+#include <string_view>
 
 namespace gl
 {
-
-class shader : private noncopyable
-{
-public:
-    shader(GLenum type);
-
-    void compile_source_code(const char *source);
-    void compile_source_file(const std::string &filename);
-
-    GLuint id() const { return id_; }
-
-private:
-    GLuint id_;
-};
-
 class shader_program : private noncopyable
 {
 public:
     shader_program();
 
-    void add_shader(const shader& s);
+    void add_shader(GLenum type, std::string_view path);
     void link();
 
     void bind();
 
-    int uniform_location(const char *name) const;
+    int uniform_location(std::string_view name) const;
 
     void set_uniform_f(int location, GLfloat v0);
     void set_uniform_f(int location, GLfloat v0, GLfloat v1);
