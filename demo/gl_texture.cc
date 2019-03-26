@@ -1,6 +1,7 @@
 #include "gl_texture.h"
 
-namespace gl {
+namespace gl
+{
 
 texture::texture(GLenum target, GLsizei width, GLsizei height, GLint internal_format)
     : target_{target}

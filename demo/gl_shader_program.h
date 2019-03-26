@@ -7,7 +7,8 @@
 #include <array>
 #include <string>
 
-namespace gl {
+namespace gl
+{
 
 class shader : private noncopyable
 {

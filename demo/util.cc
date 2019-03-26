@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 
-std::array<GLfloat, 16> init_ortho_projection_matrix(float width, float height)
+std::array<GLfloat, 16> ortho_projection_matrix(float width, float height)
 {
     const GLfloat a = 2.f/width;
     const GLfloat b = 2.f/height;

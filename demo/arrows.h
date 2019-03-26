@@ -8,7 +8,8 @@
 #include <vector>
 #include <memory>
 
-namespace gl {
+namespace gl
+{
 class shader_program;
 class texture;
 }

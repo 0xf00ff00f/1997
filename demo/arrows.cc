@@ -5,19 +5,21 @@
 #include "gl_shader_program.h"
 #include "gl_texture.h"
 
-namespace {
-constexpr int NUM_ARROWS = 256;
-constexpr int NUM_CURVE_POINTS = 30;
+namespace
+{
+constexpr auto num_arrows = 256;
+constexpr auto num_curve_points = 30;
 
-constexpr float VIRT_WIDTH = 910;
-constexpr float VIRT_HEIGHT = 512;
+constexpr auto aspect_ratio = 16.0f/9.0f;
+constexpr auto virt_height = 512.f;
+constexpr auto virt_width = virt_height*aspect_ratio;
 }
 
 arrows::arrows(int width, int height)
     : effect{width, height}
-    , ortho_proj_{init_ortho_projection_matrix(VIRT_WIDTH, VIRT_HEIGHT)}
+    , ortho_proj_{ortho_projection_matrix(virt_width, virt_height)}
     , program_{new gl::shader_program}
-    , state_texture_{new gl::texture(GL_TEXTURE_RECTANGLE, 4, NUM_ARROWS, GL_RG32F)}
+    , state_texture_{new gl::texture(GL_TEXTURE_RECTANGLE, 4, num_arrows, GL_RG32F)}
     , geometry_{new geometry}
 {
     init_gl_resources();
@@ -47,14 +49,14 @@ void arrows::init_gl_resources()
         GLfloat t;
         GLfloat is_shadow;
     };
-    std::vector<vertex> verts(2*2*(NUM_CURVE_POINTS - 1));
-    for (int i = 0; i < NUM_CURVE_POINTS - 1; ++i) {
-        const float t0 = static_cast<float>(i)/(NUM_CURVE_POINTS - 1);
-        const float t1 = static_cast<float>(i + 1)/(NUM_CURVE_POINTS - 1);
+    std::vector<vertex> verts(2*2*(num_curve_points - 1));
+    for (int i = 0; i < num_curve_points - 1; ++i) {
+        const float t0 = static_cast<float>(i)/(num_curve_points - 1);
+        const float t1 = static_cast<float>(i + 1)/(num_curve_points - 1);
         verts[2*i] = { t0, 1.0 };
-        verts[2*i + 2*(NUM_CURVE_POINTS - 1)] = { t0, 0.0 };
+        verts[2*i + 2*(num_curve_points - 1)] = { t0, 0.0 };
         verts[2*i + 1] = { t1, 1.0 };
-        verts[2*i + 2*(NUM_CURVE_POINTS - 1) + 1] = { t1, 0.0 };
+        verts[2*i + 2*(num_curve_points - 1) + 1] = { t1, 0.0 };
     }
 
     geometry_->set_data(verts, {{1, GL_FLOAT, offsetof(vertex, t)}, {1, GL_FLOAT, offsetof(vertex, is_shadow)}});
@@ -77,7 +79,7 @@ void arrows::init_arrows()
         return std::make_tuple(p, d, phi);
     };
 
-    arrows_.resize(NUM_ARROWS);
+    arrows_.resize(num_arrows);
     for (auto& arrow : arrows_) {
         std::tie(arrow.p0, arrow.d0, arrow.phi0) = gen_control_point(-40, -20, 256 - 10, 256 + 10, 5, 10);
         std::tie(arrow.p1, arrow.d1, arrow.phi1) = gen_control_point(40, 80, 256 - 200, 256 + 200, 80, 120);
@@ -124,5 +126,5 @@ void arrows::redraw(long time)
     state_texture_->bind();
 
     geometry_->bind();
-    glDrawArraysInstanced(GL_LINES, 0, 2*2*(NUM_CURVE_POINTS - 1), NUM_ARROWS);
+    glDrawArraysInstanced(GL_LINES, 0, 2*2*(num_curve_points - 1), num_arrows);
 }

@@ -8,7 +8,8 @@
 #include <vector>
 #include <string_view>
 
-namespace gl {
+namespace gl
+{
 class shader_program;
 class buffer;
 }

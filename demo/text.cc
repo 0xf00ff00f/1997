@@ -13,8 +13,8 @@
 #include <cstddef>
 #include <cassert>
 
-namespace {
-
+namespace
+{
 constexpr float aspect_ratio = 16.0/9.0;
 
 constexpr float virt_height = 640;
@@ -242,7 +242,6 @@ std::array<GLfloat, 16> mvp(float x, float y)
              0, 0, 1, 0,
              0, 0, 0, 1 };
 }
-
 }
 
 text::text(int width, int height)

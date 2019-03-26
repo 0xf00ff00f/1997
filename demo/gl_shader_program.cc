@@ -6,7 +6,8 @@
 #include <fstream>
 #include <sstream>
 
-namespace gl {
+namespace gl
+{
 
 shader::shader(GLenum type)
     : id_{glCreateShader(type)}

@@ -4,7 +4,8 @@
 
 #include <GL/glew.h>
 
-namespace gl {
+namespace gl
+{
 
 class texture : private noncopyable
 {
