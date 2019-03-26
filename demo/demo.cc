@@ -2,7 +2,6 @@
 
 #include "arrows.h"
 #include "text.h"
-#include "gl_check.h"
 
 #include <GL/glew.h>
 
@@ -23,9 +22,9 @@ void demo::redraw()
 {
     const auto now = std::chrono::steady_clock::now();
 
-    GL_CHECK(glViewport(0, 0, width_, height_));
-    GL_CHECK(glClearColor(0.5, 0.5, 0.5, 0.0));
-    GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
+    glViewport(0, 0, width_, height_);
+    glClearColor(0.5, 0.5, 0.5, 0.0);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_).count();
     arrow_effect_->redraw(elapsed);

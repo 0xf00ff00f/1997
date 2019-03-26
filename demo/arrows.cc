@@ -1,7 +1,6 @@
 #include "arrows.h"
 #include "util.h"
 
-#include "gl_check.h"
 #include "gl_shader_program.h"
 #include "gl_buffer.h"
 #include "gl_vertex_array.h"
@@ -63,11 +62,11 @@ void arrows::init_gl_resources()
     vbo_->set_data(verts.size()*sizeof(line), verts.data());
 
     vao_->bind();
-    GL_CHECK(glEnableVertexAttribArray(0));
-    GL_CHECK(glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), reinterpret_cast<void*>(0)));
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), reinterpret_cast<void*>(0));
 
-    GL_CHECK(glEnableVertexAttribArray(1));
-    GL_CHECK(glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), reinterpret_cast<void*>(sizeof(GLfloat))));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), reinterpret_cast<void*>(sizeof(GLfloat)));
 
     state_texture_->allocate(GL_RG, GL_FLOAT);
     state_texture_->set_min_filter(GL_NEAREST);
@@ -120,8 +119,8 @@ void arrows::redraw(long time)
 
     state_texture_->set_data(GL_RG, GL_FLOAT, reinterpret_cast<const GLvoid*>(&state_data_[0]));
 
-    GL_CHECK(glEnable(GL_BLEND));
-    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     program_->bind();
     program_->set_uniform_matrix4("proj_modelview", ortho_proj_);
@@ -135,5 +134,5 @@ void arrows::redraw(long time)
     state_texture_->bind();
 
     vao_->bind();
-    GL_CHECK(glDrawArraysInstanced(GL_LINES, 0, 2*2*(NUM_CURVE_POINTS - 1), NUM_ARROWS));
+    glDrawArraysInstanced(GL_LINES, 0, 2*2*(NUM_CURVE_POINTS - 1), NUM_ARROWS);
 }

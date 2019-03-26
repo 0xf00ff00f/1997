@@ -13,7 +13,7 @@ public:
     ~buffer();
 
     void bind();
-    void set_data(GLsizeiptr size, const GLvoid *data, GLenum usage = GL_STATIC_DRAW);
+    void set_data(GLsizeiptr size, const GLvoid *data, GLenum usage = GL_DYNAMIC_DRAW);
 
 private:
     GLuint id_;

@@ -1,6 +1,5 @@
 #include "text.h"
 
-#include "gl_check.h"
 #include "gl_shader_program.h"
 #include "gl_buffer.h"
 #include "gl_vertex_array.h"
@@ -316,10 +315,10 @@ void text::init_glyph_infos()
     vbo_->set_data(verts.size()*sizeof(GLfloat), &verts[0]);
 
     vao_->bind();
-    GL_CHECK(glEnableVertexAttribArray(0));
-    GL_CHECK(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(0)));
-    GL_CHECK(glEnableVertexAttribArray(1));
-    GL_CHECK(glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(2*sizeof(GLfloat))));
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(0));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(2*sizeof(GLfloat)));
 }
 
 std::array<GLfloat, 16> text::mvp(float x, float y) const
@@ -335,8 +334,8 @@ std::array<GLfloat, 16> text::mvp(float x, float y) const
 
 void text::draw_string(float x, float y, const char *str) const
 {
-    GL_CHECK(glEnable(GL_BLEND));
-    GL_CHECK(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     program_->bind();
     vao_->bind();
@@ -347,7 +346,7 @@ void text::draw_string(float x, float y, const char *str) const
         if (gi) {
             program_->set_uniform_matrix4("proj_modelview", mvp(x, y));
 
-            GL_CHECK(glDrawArrays(GL_TRIANGLE_STRIP, gi->first_vert, gi->num_verts));
+            glDrawArrays(GL_TRIANGLE_STRIP, gi->first_vert, gi->num_verts);
 
             x += gi->width;
         } else {
