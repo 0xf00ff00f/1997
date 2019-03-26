@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <vector>
+#include <string_view>
 
 namespace gl {
 class shader_program;
@@ -26,9 +27,9 @@ private:
     void init_gl_resources();
     void init_glyph_infos();
 
-    void draw_string(float x, float y, const char *str) const;
+    void draw_string(float x, float y, std::string_view str) const;
     std::array<GLfloat, 16> mvp(float x, float y) const;
-    int string_width(const char *str) const;
+    int string_width(std::string_view str) const;
 
     struct glyph_info {
         int width;

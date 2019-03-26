@@ -319,7 +319,7 @@ std::array<GLfloat, 16> text::mvp(float x, float y) const
              0, 0, 0, 1 };
 }
 
-void text::draw_string(float x, float y, const char *str) const
+void text::draw_string(float x, float y, std::string_view str) const
 {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -327,14 +327,10 @@ void text::draw_string(float x, float y, const char *str) const
     program_->bind();
     geometry_->bind();
 
-    for (const char *p = str; *p; ++p) {
-        char ch = *p;
-        auto& gi = glyph_infos_[ch];
-        if (gi) {
+    for (auto ch : str) {
+        if (auto& gi = glyph_infos_[ch]) {
             program_->set_uniform_matrix4("proj_modelview", mvp(x, y));
-
             glDrawArrays(GL_TRIANGLE_STRIP, gi->first_vert, gi->num_verts);
-
             x += gi->width;
         } else {
             x += 100;
@@ -342,18 +338,15 @@ void text::draw_string(float x, float y, const char *str) const
     }
 }
 
-int text::string_width(const char *str) const
+int text::string_width(std::string_view str) const
 {
     int width = 0;
 
-    for (const char *p = str; *p; ++p) {
-        char ch = *p;
-        auto& gi = glyph_infos_[ch];
-        if (gi) {
+    for (auto ch : str) {
+        if (auto& gi = glyph_infos_[ch])
             width += gi->width;
-        } else {
+        else
             width += 100;
-        }
     }
 
     return width;
