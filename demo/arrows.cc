@@ -5,8 +5,6 @@
 #include "gl_shader_program.h"
 #include "gl_texture.h"
 
-#include <cstddef>
-
 namespace {
 constexpr int NUM_ARROWS = 256;
 constexpr int NUM_CURVE_POINTS = 30;
@@ -92,7 +90,6 @@ void arrows::redraw(long time)
     const float t = static_cast<float>(time)/1000.0;
 
     // XXX probably should  be computed in vertex shader
-
     for (size_t i = 0; i < arrows_.size(); ++i) {
         const auto& arrow = arrows_[i];
         auto data = &state_data_[i*state_texture_->width()*2];
@@ -105,7 +102,7 @@ void arrows::redraw(long time)
         *data++ = p1.x;
         *data++ = p1.y;
 
-        const vec2f p2 = arrow.p2 + arrow.d2*cosf(t*arrow.phi1);
+        const vec2f p2 = arrow.p2 + arrow.d2*cosf(t*arrow.phi2);
         *data++ = p2.x;
         *data++ = p2.y;
     }
