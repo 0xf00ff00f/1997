@@ -10,8 +10,9 @@
 namespace gl {
 class shader_program;
 class buffer;
-class vertex_array;
 }
+
+class geometry;
 
 class text : public effect
 {
@@ -36,6 +37,5 @@ private:
     };
     std::array<std::unique_ptr<glyph_info>, 256> glyph_infos_;
     std::unique_ptr<gl::shader_program> program_;
-    std::unique_ptr<gl::buffer> vbo_;
-    std::unique_ptr<gl::vertex_array> vao_;
+    std::unique_ptr<geometry> geometry_;
 };

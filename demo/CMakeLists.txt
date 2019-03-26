@@ -15,9 +15,7 @@ set(DEMO_SOURCES
     panic.cc
     util.cc
     gl_shader_program.cc
-    gl_buffer.cc
     gl_texture.cc
-    gl_vertex_array.cc
     demo.cc
     effect.cc
     arrows.cc

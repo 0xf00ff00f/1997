@@ -1,10 +1,11 @@
 #include "arrows.h"
-#include "util.h"
 
+#include "util.h"
+#include "geometry.h"
 #include "gl_shader_program.h"
-#include "gl_buffer.h"
-#include "gl_vertex_array.h"
 #include "gl_texture.h"
+
+#include <cstddef>
 
 namespace {
 constexpr int NUM_ARROWS = 256;
@@ -18,9 +19,8 @@ arrows::arrows(int width, int height)
     : effect{width, height}
     , ortho_proj_{init_ortho_projection_matrix(VIRT_WIDTH, VIRT_HEIGHT)}
     , program_{new gl::shader_program}
-    , vbo_{new gl::buffer(GL_ARRAY_BUFFER)}
-    , vao_{new gl::vertex_array}
     , state_texture_{new gl::texture(GL_TEXTURE_RECTANGLE, 4, NUM_ARROWS, GL_RG32F)}
+    , geometry_{new geometry}
 {
     init_gl_resources();
     init_arrows();
@@ -46,27 +46,22 @@ void arrows::init_gl_resources()
 
     program_->link();
 
-    struct line {
-        GLfloat t0;
-        GLfloat is_shadow_0;
-        GLfloat t1;
-        GLfloat is_shadow_1;
+    struct vertex
+    {
+        GLfloat t;
+        GLfloat is_shadow;
     };
-    std::array<line, 2*(NUM_CURVE_POINTS - 1)> verts;
+    std::vector<vertex> verts(2*2*(NUM_CURVE_POINTS - 1));
     for (int i = 0; i < NUM_CURVE_POINTS - 1; ++i) {
         const float t0 = static_cast<float>(i)/(NUM_CURVE_POINTS - 1);
         const float t1 = static_cast<float>(i + 1)/(NUM_CURVE_POINTS - 1);
-        verts[i] = { t0, 1.0, t1, 1.0 };
-        verts[i + (NUM_CURVE_POINTS - 1)] = { t0, 0.0, t1, 0.0 };
+        verts[2*i] = { t0, 1.0 };
+        verts[2*i + 2*(NUM_CURVE_POINTS - 1)] = { t0, 0.0 };
+        verts[2*i + 1] = { t1, 1.0 };
+        verts[2*i + 2*(NUM_CURVE_POINTS - 1) + 1] = { t1, 0.0 };
     }
-    vbo_->set_data(verts.size()*sizeof(line), verts.data());
 
-    vao_->bind();
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), reinterpret_cast<void*>(0));
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 2*sizeof(GLfloat), reinterpret_cast<void*>(sizeof(GLfloat)));
+    geometry_->set_data(verts, {{1, GL_FLOAT, offsetof(vertex, t)}, {1, GL_FLOAT, offsetof(vertex, is_shadow)}});
 
     state_texture_->allocate(GL_RG, GL_FLOAT);
     state_texture_->set_min_filter(GL_NEAREST);
@@ -133,6 +128,6 @@ void arrows::redraw(long time)
 
     state_texture_->bind();
 
-    vao_->bind();
+    geometry_->bind();
     glDrawArraysInstanced(GL_LINES, 0, 2*2*(NUM_CURVE_POINTS - 1), NUM_ARROWS);
 }

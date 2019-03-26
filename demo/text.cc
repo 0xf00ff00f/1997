@@ -1,8 +1,7 @@
 #include "text.h"
 
+#include "geometry.h"
 #include "gl_shader_program.h"
-#include "gl_buffer.h"
-#include "gl_vertex_array.h"
 #include "vec2.h"
 
 #include <GL/glew.h>
@@ -10,6 +9,7 @@
 #include <vector>
 
 #include <cstdio>
+#include <cstddef>
 #include <cassert>
 
 namespace {
@@ -234,8 +234,7 @@ auto triangle_strip_from_line_strip(const line_strip& strip)
 text::text(int width, int height)
     : effect{width, height}
     , program_{new gl::shader_program}
-    , vbo_{new gl::buffer(GL_ARRAY_BUFFER)}
-    , vao_{new gl::vertex_array}
+    , geometry_{new geometry}
 {
     init_gl_resources();
     init_glyph_infos();
@@ -273,52 +272,40 @@ void text::init_gl_resources()
 
 void text::init_glyph_infos()
 {
-    std::vector<GLfloat> verts;
+    struct vert
+    {
+        GLfloat x;
+        GLfloat y;
+        GLfloat d;
+    };
+    std::vector<vert> verts;
 
     for (const auto& glyph : glyphs) {
         std::unique_ptr<glyph_info> gi{new glyph_info};
         gi->width = glyph.width;
-        gi->first_vert = verts.size()/3;
+        gi->first_vert = verts.size();
 
         for (auto& line_strip : glyph.strips) {
             auto s = triangle_strip_from_line_strip(line_strip);
 
             if (!verts.empty()) {
                 // add degenerate triangle
-                auto prev_x = verts[verts.size() - 3];
-                auto prev_y = verts[verts.size() - 2];
-
-                verts.push_back(prev_x);
-                verts.push_back(prev_y);
-                verts.push_back(0);
-
-                verts.push_back(s.front().first.x);
-                verts.push_back(s.front().first.y);
-                verts.push_back(0);
+                const auto &prev = verts.back();
+                verts.push_back({prev.x, prev.y, 0});
+                verts.push_back({s.front().first.x, s.front().first.y, 0});
             }
 
             for (const auto& v : s) {
-                verts.push_back(v.first.x);
-                verts.push_back(v.first.y);
-                verts.push_back(1);
-
-                verts.push_back(v.second.x);
-                verts.push_back(v.second.y);
-                verts.push_back(-1);
+                verts.push_back({v.first.x, v.first.y, 1});
+                verts.push_back({v.second.x, v.second.y, -1});
             }
         }
 
-        gi->num_verts = verts.size()/3 - gi->first_vert;
+        gi->num_verts = verts.size() - gi->first_vert;
         glyph_infos_[glyph.code] = std::move(gi);
     }
 
-    vbo_->set_data(verts.size()*sizeof(GLfloat), &verts[0]);
-
-    vao_->bind();
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(0));
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), reinterpret_cast<void*>(2*sizeof(GLfloat)));
+    geometry_->set_data(verts, {{2, GL_FLOAT, offsetof(vert, x)}, {1, GL_FLOAT, offsetof(vert, d)}});
 }
 
 std::array<GLfloat, 16> text::mvp(float x, float y) const
@@ -338,7 +325,7 @@ void text::draw_string(float x, float y, const char *str) const
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     program_->bind();
-    vao_->bind();
+    geometry_->bind();
 
     for (const char *p = str; *p; ++p) {
         char ch = *p;
