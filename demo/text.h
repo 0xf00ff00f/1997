@@ -28,7 +28,6 @@ private:
     void init_glyph_infos();
 
     void draw_string(float x, float y, std::string_view str) const;
-    std::array<GLfloat, 16> mvp(float x, float y) const;
     int string_width(std::string_view str) const;
 
     struct glyph_info {

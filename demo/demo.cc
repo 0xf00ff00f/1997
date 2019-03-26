@@ -14,9 +14,7 @@ demo::demo(int width, int height)
     start_ = std::chrono::steady_clock::now();
 }
 
-demo::~demo()
-{
-}
+demo::~demo() = default;
 
 void demo::redraw()
 {

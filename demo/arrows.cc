@@ -26,9 +26,7 @@ arrows::arrows(int width, int height)
     init_arrows();
 }
 
-arrows::~arrows()
-{
-}
+arrows::~arrows() = default;
 
 void arrows::init_gl_resources()
 {

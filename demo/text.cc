@@ -7,6 +7,7 @@
 #include <GL/glew.h>
 
 #include <vector>
+#include <numeric>
 
 #include <cstdio>
 #include <cstddef>
@@ -20,6 +21,8 @@ constexpr float virt_height = 640;
 constexpr float virt_width = virt_height*aspect_ratio;
 
 constexpr float half_thickness = 8;
+
+constexpr auto space_width = 100;
 
 struct line_strip {
     bool closed;
@@ -229,6 +232,17 @@ auto triangle_strip_from_line_strip(const line_strip& strip)
     return tri_strip;
 }
 
+std::array<GLfloat, 16> mvp(float x, float y)
+{
+    const GLfloat a = 2.f/virt_width;
+    const GLfloat b = 2.f/virt_height;
+
+    return { a, 0, 0, a*x - 1,
+             0, b, 0, b*y - 1,
+             0, 0, 1, 0,
+             0, 0, 0, 1 };
+}
+
 }
 
 text::text(int width, int height)
@@ -240,9 +254,7 @@ text::text(int width, int height)
     init_glyph_infos();
 }
 
-text::~text()
-{
-}
+text::~text() = default;
 
 void text::redraw(long)
 {
@@ -308,17 +320,6 @@ void text::init_glyph_infos()
     geometry_->set_data(verts, {{2, GL_FLOAT, offsetof(vert, x)}, {1, GL_FLOAT, offsetof(vert, d)}});
 }
 
-std::array<GLfloat, 16> text::mvp(float x, float y) const
-{
-    const GLfloat a = 2.f/virt_width;
-    const GLfloat b = 2.f/virt_height;
-
-    return { a, 0, 0, a*x - 1,
-             0, b, 0, b*y - 1,
-             0, 0, 1, 0,
-             0, 0, 0, 1 };
-}
-
 void text::draw_string(float x, float y, std::string_view str) const
 {
     glEnable(GL_BLEND);
@@ -333,21 +334,17 @@ void text::draw_string(float x, float y, std::string_view str) const
             glDrawArrays(GL_TRIANGLE_STRIP, gi->first_vert, gi->num_verts);
             x += gi->width;
         } else {
-            x += 100;
+            x += space_width;
         }
     }
 }
 
 int text::string_width(std::string_view str) const
 {
-    int width = 0;
-
-    for (auto ch : str) {
+    return std::accumulate(str.begin(), str.end(), 0, [this](auto s, auto ch) {
         if (auto& gi = glyph_infos_[ch])
-            width += gi->width;
+            return s + gi->width;
         else
-            width += 100;
-    }
-
-    return width;
+            return s + space_width;
+    });
 }
