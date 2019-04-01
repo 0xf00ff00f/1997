@@ -12,7 +12,6 @@ include_directories(
 
 set(DEMO_SOURCES
     main.cc
-    panic.cc
     util.cc
     gl_shader_program.cc
     gl_texture.cc
