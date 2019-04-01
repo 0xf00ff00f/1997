@@ -100,7 +100,7 @@ void arrows::redraw(long time)
         *data++ = p2.y;
     }
 
-    state_texture_->set_data(GL_RG, GL_FLOAT, reinterpret_cast<const GLvoid*>(&state_data_[0]));
+    state_texture_->set_data(GL_RG, GL_FLOAT, reinterpret_cast<const GLvoid*>(state_data_.data()));
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
