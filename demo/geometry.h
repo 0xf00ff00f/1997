@@ -28,7 +28,7 @@ public:
         std::size_t offset;
     };
 
-    template<typename T>
+    template <typename T>
     void set_data(const std::vector<T> &buf, const std::vector<vertex_attrib> &attribs)
     {
         glBindBuffer(GL_ARRAY_BUFFER, vbo_);

@@ -9,7 +9,7 @@ inline void panic(const char *fmt)
     abort();
 }
 
-template<typename ... Args>
+template <typename ... Args>
 inline void panic(const char *fmt, const Args& ... args)
 {
     fprintf(stderr, fmt, args...);
