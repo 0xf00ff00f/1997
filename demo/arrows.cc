@@ -19,7 +19,6 @@ arrows::arrows(int width, int height)
     : effect{width, height}
     , ortho_proj_{ortho_projection_matrix(virt_width, virt_height)}
     , program_{new gl::shader_program}
-    , state_texture_{new gl::texture(GL_TEXTURE_RECTANGLE, 4, num_arrows, GL_RG32F)}
     , geometry_{new geometry}
 {
     init_gl_resources();
@@ -52,13 +51,10 @@ void arrows::init_gl_resources()
 
     geometry_->set_data(verts, {{1, GL_FLOAT, offsetof(vertex, t)}, {1, GL_FLOAT, offsetof(vertex, is_shadow)}});
 
-    state_texture_->allocate(GL_RG, GL_FLOAT);
-    state_texture_->set_min_filter(GL_NEAREST);
-    state_texture_->set_mag_filter(GL_NEAREST);
-    state_texture_->set_wrap_s(GL_CLAMP_TO_EDGE);
-    state_texture_->set_wrap_t(GL_CLAMP_TO_EDGE);
-
-    state_data_.resize(state_texture_->width()*state_texture_->height()*2);
+    glGenBuffers(1, &state_ssbo_);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, state_ssbo_);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, num_arrows * 2 * 3 * sizeof(GLfloat), nullptr, GL_DYNAMIC_COPY);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
 
 void arrows::init_arrows()
@@ -82,11 +78,9 @@ void arrows::redraw(long time)
 {
     const float t = static_cast<float>(time)/1000.0;
 
-    // XXX probably should  be computed in vertex shader
-    for (size_t i = 0; i < arrows_.size(); ++i) {
-        const auto& arrow = arrows_[i];
-        auto data = &state_data_[i*state_texture_->width()*2];
-
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, state_ssbo_);
+    auto *data = static_cast<GLfloat *>(glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY));
+    for (const auto &arrow : arrows_) {
         const vec2f p0 = arrow.p0 + arrow.d0*cosf(t*arrow.phi0);
         *data++ = p0.x;
         *data++ = p0.y;
@@ -99,8 +93,7 @@ void arrows::redraw(long time)
         *data++ = p2.x;
         *data++ = p2.y;
     }
-
-    state_texture_->set_data(GL_RG, GL_FLOAT, reinterpret_cast<const GLvoid*>(state_data_.data()));
+    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -114,7 +107,7 @@ void arrows::redraw(long time)
     program_->set_uniform_f("spotlight_center", .05, .95);
     program_->set_uniform_i("state_texture", 0); // texunit 0
 
-    state_texture_->bind();
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, state_ssbo_);
 
     geometry_->bind();
     glDrawArraysInstanced(GL_LINES, 0, 2*2*(num_curve_points - 1), num_arrows);

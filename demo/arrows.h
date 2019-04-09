@@ -38,7 +38,6 @@ private:
 
     std::array<GLfloat, 16> ortho_proj_;
     std::unique_ptr<gl::shader_program> program_;
-    std::unique_ptr<gl::texture> state_texture_;
-    std::vector<GLfloat> state_data_;
+    GLuint state_ssbo_;
     std::unique_ptr<geometry> geometry_;
 };

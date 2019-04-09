@@ -1,4 +1,4 @@
-#version 330
+#version 450
 
 uniform vec2 resolution;
 uniform vec2 spotlight_center;

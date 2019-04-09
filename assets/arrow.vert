@@ -1,11 +1,19 @@
-#version 330
-
-uniform sampler2DRect state_texture;
+#version 450
 
 uniform float start_thickness;
 uniform float end_thickness;
 
 uniform vec2 shadow_offset;
+
+struct arrow_state
+{
+    vec2 p0, p1, p2;
+};
+
+layout(binding=0) buffer ArrowState
+{
+    arrow_state arrows[];
+};
 
 layout(location=0) in float t;
 layout(location=1) in float is_shadow;
@@ -21,9 +29,9 @@ out vec2 v_dir;
 
 void main(void)
 {
-    vec2 p0 = texture(state_texture, vec2(0.5, gl_InstanceID + 0.5)).rg;
-    vec2 p1 = texture(state_texture, vec2(1.5, gl_InstanceID + 0.5)).rg;
-    vec2 p2 = texture(state_texture, vec2(2.5, gl_InstanceID + 0.5)).rg;
+    vec2 p0 = arrows[gl_InstanceID].p0;
+    vec2 p1 = arrows[gl_InstanceID].p1;
+    vec2 p2 = arrows[gl_InstanceID].p2;
 
     // quadratic bezier
     vec2 p = mix(mix(p0, p1, t), mix(p1, p2, t), t);
