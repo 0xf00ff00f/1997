@@ -24,6 +24,7 @@ add_executable(demo ${DEMO_SOURCES})
 
 target_link_libraries(
     demo
+    glm
     ${OPENGL_LIBRARIES}
     ${GLFW3_LIBRARY}
     ${GLEW_LIBRARY})

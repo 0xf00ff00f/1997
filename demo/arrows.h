@@ -1,8 +1,7 @@
 #include "effect.h"
 
-#include "vec2.h"
-
 #include <GL/glew.h>
+#include <glm/glm.hpp>
 
 #include <array>
 #include <memory>
@@ -30,9 +29,9 @@ private:
 
     struct arrow_info
     {
-        vec2f p0, d0;
-        vec2f p1, d1;
-        vec2f p2, d2;
+        glm::vec2 p0, d0;
+        glm::vec2 p1, d1;
+        glm::vec2 p2, d2;
         float phi0, phi1, phi2;
     };
     std::vector<arrow_info> arrows_;

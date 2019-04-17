@@ -2,7 +2,8 @@
 
 #include "geometry.h"
 #include "gl_shader_program.h"
-#include "vec2.h"
+
+#include <glm/glm.hpp>
 
 #include <GL/glew.h>
 
@@ -26,7 +27,7 @@ constexpr auto space_width = 100;
 
 struct line_strip {
     bool closed;
-    std::vector<vec2f> verts;
+    std::vector<glm::vec2> verts;
 };
 
 const struct {
@@ -182,7 +183,7 @@ auto triangle_strip_from_line_strip(const line_strip& strip)
 
     assert(verts.size() >= 2);
 
-    std::vector<std::pair<vec2f, vec2f>> tri_strip;
+    std::vector<std::pair<glm::vec2, glm::vec2>> tri_strip;
 
     const auto num_verts = verts.size();
     const auto count = strip.closed ? num_verts + 1 : num_verts;
@@ -190,14 +191,14 @@ auto triangle_strip_from_line_strip(const line_strip& strip)
     for (size_t i = 0; i < count; ++i) {
         const auto& p = verts[i%num_verts];
 
-        vec2f u;
+        glm::vec2 u;
 
         if (i == 0 && !strip.closed) {
             // first
             const auto& p1 = verts[1];
 
-            const vec2f d = normalized(p1 - p);
-            const vec2f n = vec2f(-d.y, d.x);
+            const auto d = glm::normalize(p1 - p);
+            const auto n = glm::vec2(-d.y, d.x);
 
             u = n*half_thickness;
         } else if (i == verts.size() - 1 && !strip.closed) {
@@ -205,21 +206,21 @@ auto triangle_strip_from_line_strip(const line_strip& strip)
 
             const auto& p1 = verts[i - 1];
 
-            const vec2f d = normalized(p - p1);
-            const vec2f n = vec2f(-d.y, d.x);
+            const auto d = glm::normalize(p - p1);
+            const auto n = glm::vec2(-d.y, d.x);
 
             u = n*half_thickness;
         } else {
             const auto& p0 = verts[(i + num_verts - 1)%num_verts];
             const auto& p2 = verts[(i + 1)%num_verts];
 
-            vec2f d0 = normalized(p - p0);
-            vec2f n0 = vec2f(-d0.y, d0.x);
+            auto d0 = glm::normalize(p - p0);
+            auto n0 = glm::vec2(-d0.y, d0.x);
 
-            vec2f d1 = normalized(p2 - p);
-            vec2f n1 = vec2f(-d1.y, d1.x);
+            auto d1 = glm::normalize(p2 - p);
+            auto n1 = glm::vec2(-d1.y, d1.x);
 
-            vec2f n = normalized(n0 + n1);
+            auto n = glm::normalize(n0 + n1);
 
             float l = half_thickness/dot(n, n0);
 

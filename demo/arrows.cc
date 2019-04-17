@@ -5,6 +5,8 @@
 #include "gl_shader_program.h"
 #include "gl_texture.h"
 
+#include <glm/gtx/rotate_vector.hpp>
+
 namespace
 {
 constexpr auto num_arrows = 256;
@@ -60,8 +62,8 @@ void arrows::init_gl_resources()
 void arrows::init_arrows()
 {
     const auto gen_control_point = [](float min_x, float max_x, float min_y, float max_y, float min_d, float max_d) {
-        vec2f p{randf(min_x, max_x), randf(min_y, max_y)};
-        vec2f d = randf(min_d, max_d)*vec2f{1.0, 0.0}.rotate(randf()*2.0*M_PI);
+        glm::vec2 p(randf(min_x, max_x), randf(min_y, max_y));
+        glm::vec2 d = randf(min_d, max_d)*glm::rotate(glm::vec2(1.0, 0.0), static_cast<float>(randf()*2.0*M_PI));
         float phi = randf(1.0, 3.0);
         return std::make_tuple(p, d, phi);
     };
@@ -81,15 +83,15 @@ void arrows::redraw(long time)
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, state_ssbo_);
     auto *data = static_cast<GLfloat *>(glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY));
     for (const auto &arrow : arrows_) {
-        const vec2f p0 = arrow.p0 + arrow.d0*cosf(t*arrow.phi0);
+        auto p0 = arrow.p0 + arrow.d0*cosf(t*arrow.phi0);
         *data++ = p0.x;
         *data++ = p0.y;
 
-        const vec2f p1 = arrow.p1 + arrow.d1*cosf(t*arrow.phi1);
+        auto p1 = arrow.p1 + arrow.d1*cosf(t*arrow.phi1);
         *data++ = p1.x;
         *data++ = p1.y;
 
-        const vec2f p2 = arrow.p2 + arrow.d2*cosf(t*arrow.phi2);
+        auto p2 = arrow.p2 + arrow.d2*cosf(t*arrow.phi2);
         *data++ = p2.x;
         *data++ = p2.y;
     }
