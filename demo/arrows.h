@@ -5,14 +5,14 @@
 #include <GL/glew.h>
 
 #include <array>
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace gl
 {
 class shader_program;
 class texture;
-}
+} // namespace gl
 
 class geometry;
 
@@ -28,7 +28,8 @@ private:
     void init_gl_resources();
     void init_arrows();
 
-    struct arrow_info {
+    struct arrow_info
+    {
         vec2f p0, d0;
         vec2f p1, d1;
         vec2f p2, d2;

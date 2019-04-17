@@ -37,4 +37,4 @@ private:
     GLint internal_format_;
 };
 
-}
+} // namespace gl

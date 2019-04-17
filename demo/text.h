@@ -5,14 +5,14 @@
 #include <GL/glew.h>
 
 #include <memory>
-#include <vector>
 #include <string_view>
+#include <vector>
 
 namespace gl
 {
 class shader_program;
 class buffer;
-}
+} // namespace gl
 
 class geometry;
 
@@ -31,7 +31,8 @@ private:
     void draw_string(float x, float y, std::string_view str) const;
     int string_width(std::string_view str) const;
 
-    struct glyph_info {
+    struct glyph_info
+    {
         int width;
         int first_vert;
         int num_verts;

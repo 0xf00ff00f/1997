@@ -1,7 +1,7 @@
 #pragma once
 
-#include "noncopyable.h"
 #include "effect.h"
+#include "noncopyable.h"
 
 #include <chrono>
 #include <memory>

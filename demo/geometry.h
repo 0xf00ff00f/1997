@@ -39,14 +39,12 @@ public:
         {
             const auto &attrib = attribs[i];
             glEnableVertexAttribArray(i);
-            glVertexAttribPointer(i, attrib.size, attrib.type, GL_FALSE, sizeof(T), reinterpret_cast<GLvoid *>(attrib.offset));
+            glVertexAttribPointer(i, attrib.size, attrib.type, GL_FALSE, sizeof(T),
+                                  reinterpret_cast<GLvoid *>(attrib.offset));
         }
     }
 
-    void bind()
-    {
-        glBindVertexArray(vao_);
-    }
+    void bind() { glBindVertexArray(vao_); }
 
 private:
     GLuint vao_;
